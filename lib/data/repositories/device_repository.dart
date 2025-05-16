@@ -7,7 +7,7 @@ import 'package:placas_app/model/device.dart';
 class DeviceRepository {
   final Databases _databases = AppwriteConfig.databases;
 
-  String _generateUniqueCode() {
+  String _generateDeviceCode() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     final random = Random();
     return List.generate(
@@ -29,42 +29,65 @@ class DeviceRepository {
   Future<Device> createDevice({
     required String name,
     required String userId,
+    String? description,
+    String? location,
   }) async {
     try {
-      final uniqueCode = _generateUniqueCode();
+      final deviceCode = _generateDeviceCode();
       final apiKey = _generateApiKey();
+      final now = DateTime.now().toIso8601String();
+
+      print('Intentando crear dispositivo con: Name: $name, UserId: $userId');
+
+      final data = {
+        'name': name,
+        'deviceCode': deviceCode,
+        'apiKey': apiKey,
+        'userId': userId,
+        'status': 'inactive',
+        'lastReading': now,
+        'createdAt': now,
+        'updatedAt': now,
+      };
+
+      if (description != null) data['description'] = description;
+      if (location != null) data['location'] = location;
+
+      print('Datos a enviar: $data');
 
       final response = await _databases.createDocument(
         databaseId: AppwriteConstants.databaseId,
         collectionId: AppwriteConstants.devicesCollectionId,
         documentId: ID.unique(),
-        data: {
-          'name': name,
-          'unique_code': uniqueCode,
-          'api_key': apiKey,
-          'user_id': userId,
-          'created_at': DateTime.now().toIso8601String(),
-        },
+        data: data,
       );
+
+      print('Dispositivo creado con éxito: ${response.data}');
 
       return Device.fromJson(response.data);
     } catch (e) {
+      print('Error al crear dispositivo: $e');
       rethrow;
     }
   }
 
   Future<List<Device>> getUserDevices(String userId) async {
     try {
+      print('Buscando dispositivos para el usuario: $userId');
+
       final response = await _databases.listDocuments(
         databaseId: AppwriteConstants.databaseId,
         collectionId: AppwriteConstants.devicesCollectionId,
-        queries: [Query.equal('user_id', userId)],
+        queries: [Query.equal('userId', userId)],
       );
+
+      print('Dispositivos encontrados: ${response.documents.length}');
 
       return response.documents
           .map((doc) => Device.fromJson(doc.data))
           .toList();
     } catch (e) {
+      print('Error al obtener dispositivos: $e');
       rethrow;
     }
   }
@@ -79,6 +102,7 @@ class DeviceRepository {
 
       return Device.fromJson(response.data);
     } catch (e) {
+      print('Error al obtener dispositivo: $e');
       rethrow;
     }
   }
@@ -91,6 +115,7 @@ class DeviceRepository {
         documentId: deviceId,
       );
     } catch (e) {
+      print('Error al eliminar dispositivo: $e');
       rethrow;
     }
   }

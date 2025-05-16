@@ -15,7 +15,7 @@ class ReadingRepository {
         databaseId: AppwriteConstants.databaseId,
         collectionId: AppwriteConstants.readingsCollectionId,
         queries: [
-          Query.equal('device_id', deviceId),
+          Query.equal('deviceId', deviceId),
           Query.orderDesc('timestamp'),
           Query.limit(limit),
         ],
@@ -25,30 +25,7 @@ class ReadingRepository {
           .map((doc) => Reading.fromJson(doc.data))
           .toList();
     } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<Reading> createReading({
-    required String deviceId,
-    required double temperature,
-    required double humidity,
-  }) async {
-    try {
-      final response = await _databases.createDocument(
-        databaseId: AppwriteConstants.databaseId,
-        collectionId: AppwriteConstants.readingsCollectionId,
-        documentId: ID.unique(),
-        data: {
-          'device_id': deviceId,
-          'temperature': temperature,
-          'humidity': humidity,
-          'timestamp': DateTime.now().toIso8601String(),
-        },
-      );
-
-      return Reading.fromJson(response.data);
-    } catch (e) {
+      print('Error en getDeviceReadings: $e');
       rethrow;
     }
   }
