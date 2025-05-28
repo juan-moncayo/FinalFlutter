@@ -4,10 +4,9 @@
 
 Desarrollé una aplicación móvil con Flutter para monitorear dispositivos IoT que miden temperatura y humedad en tiempo real. La aplicación me permite:
 
-- Visualizar lecturas de temperatura y humedad de múltiples dispositivos
+- Visualizar lecturas de temperatura y humedad
 - Recibir alertas cuando los valores están fuera de los rangos seguros
-- Ver gráficos y estadísticas de los datos recopilados
-- Gestionar mis dispositivos (agregar, configurar, eliminar)
+- Gestionar mis dispositivos (agregar, configurar)
 
 
 ## Acceso a la aplicación
